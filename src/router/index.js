@@ -1,17 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import routes from './routes'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [{
-    path: '/',
-    name: 'dashboard',
-    component: () => import('../pages/Dashboard.vue'),
-    meta: {
-      layout: 'App',
-      isMenu: true
-    }
-  }],
+  routes,
   linkActiveClass: 'text-grey-9 text-weight-bold'
 })
 
 export default router
+
