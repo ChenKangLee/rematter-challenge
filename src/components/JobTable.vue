@@ -4,10 +4,11 @@
       :rows="rows"
       :columns="columns"
       row-key="name"
-      no-data-label="No Past Jobs! Start A New One"
+      no-data-label="No past jobs! Start a new one"
       :rows-per-page-options="[0]"
       flat
       bordered
+      @row-click="rowClick"
     >
       <template #top>
         <div class="text-subtitle1 text-weight-medium">Past Jobs</div>
@@ -17,8 +18,12 @@
 </template>
 
 <script>
+import { toRefs } from "vue";
+
 export default {
-  setup() {
+  props: ["rows"],
+  emits: ["row-click"],
+  setup(props, { emit }) {
     const columns = [
       {
         name: "id",
@@ -42,17 +47,16 @@ export default {
         field: (row) => row.date,
       },
     ];
-    const rows = [
-      {
-        id: "abc123",
-        name: "Chen-Kang Lee",
-        date: Date(2024, 2, 17),
-      },
-    ];
+    const { rows } = toRefs(props);
+
+    const rowClick = (evnt, row, idx) => {
+      emit("row-click", row);
+    };
 
     return {
       columns,
       rows,
+      rowClick,
     };
   },
 };

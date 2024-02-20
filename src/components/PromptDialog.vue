@@ -38,20 +38,29 @@
 
 <script>
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import { createWorker, OEM } from "tesseract.js";
 
 export default {
-  setup() {
+  emits: ["onCapture"],
+  setup(props, { emit }) {
     const video = ref(null);
     const canvas = ref(null);
     const context = ref(false);
     const frameTimer = ref(null);
+    const worker = ref(null);
     const constraints = ref({
       audio: false,
       video: {
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
+        width: { min: 1024, ideal: 1280, max: 1920 },
+        height: { min: 576, ideal: 720, max: 1080 },
       },
     });
+
+    navigator.getUserMedia =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia;
 
     const drawFrame = () => {
       context.value.drawImage(
@@ -92,7 +101,20 @@ export default {
       video.value.srcObject.getTracks().forEach((track) => track.stop());
     });
 
-    const onCapture = async () => {};
+    const onCapture = async () => {
+      if (canvas.value) {
+        const dataUrl = canvas.value.toDataURL("image/png");
+        const dateNow = new Date();
+        const job_info = {
+          id: 1,
+          name: "Chen-Kang Lee",
+          date: dateNow.toLocaleString("en-US", { timeZoneName: "short" }),
+          img: dataUrl,
+        };
+
+        emit("onCapture", job_info);
+      }
+    };
 
     return {
       loader: ref(false),

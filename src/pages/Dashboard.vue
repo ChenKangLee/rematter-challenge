@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div class="row justify-between q-col-gutter-lg">
+    <div class="row q-col-gutter-lg">
       <div class="col-shrink">
         <div class="text-h6">Title</div>
       </div>
@@ -19,11 +19,14 @@
                 />
               </div>
             </div>
-            <div class="row q-pr-lg">
+            <div class="row justify-center q-pr-lg">
               <div class="col-12">
-                <JobTable />
+                <JobTable :rows="pastJobs" @row-click="setSelectedRow" />
               </div>
             </div>
+          </template>
+          <template #after>
+            <JobDetails :selectedRow="selectedRow" />
           </template>
         </q-splitter>
       </div>
@@ -35,18 +38,36 @@
     transition-show="scale"
     transition-hide="scale"
   >
-    <PromptDialog />
+    <PromptDialog @onCapture="onCapture" />
   </q-dialog>
 </template>
 
 <script>
 import { ref } from "vue";
+import { useJobStore } from "../store/jobStore";
+import { computed } from "@vue/reactivity";
 
 export default {
   setup() {
+    const store = useJobStore();
+    const pastJobs = computed(() => store.jobs);
+    const selectedRow = ref(null);
+
+    const onCapture = (job_info) => {
+      store.addJob(job_info);
+    };
+
+    const setSelectedRow = (row) => {
+      selectedRow.value = row;
+    };
+
     return {
-      splitterModel: ref(40),
+      splitterModel: ref(45),
       showPrompt: ref(false),
+      pastJobs,
+      onCapture,
+      setSelectedRow,
+      selectedRow,
     };
   },
 };

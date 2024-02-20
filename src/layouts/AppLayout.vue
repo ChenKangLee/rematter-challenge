@@ -56,8 +56,6 @@ const linksList = [
 export default {
   setup() {
     const leftDrawerOpen = ref(false);
-
-    console.log(leftDrawerOpen.value);
     const toggleLeftDrawer = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
     };
