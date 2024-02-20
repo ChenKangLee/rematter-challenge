@@ -15,7 +15,12 @@
               muted
               hidden
             ></video>
-            <canvas ref="canvas" class="viewport fit rounded-borders"></canvas>
+            <canvas
+              width="1280"
+              height="720"
+              ref="canvas"
+              class="viewport fit rounded-borders"
+            ></canvas>
           </div>
         </q-responsive>
       </div>
@@ -51,8 +56,8 @@ export default {
     const constraints = ref({
       audio: false,
       video: {
-        width: { min: 1024, ideal: 1280, max: 1920 },
-        height: { min: 576, ideal: 720, max: 1080 },
+        width: { min: 1280, ideal: 1280, max: 1920 },
+        height: { min: 720, ideal: 720, max: 1080 },
       },
     });
 
@@ -106,7 +111,6 @@ export default {
         const dataUrl = canvas.value.toDataURL("image/png");
         const dateNow = new Date();
         const job_info = {
-          id: 1,
           name: "Chen-Kang Lee",
           date: dateNow.toLocaleString("en-US", { timeZoneName: "short" }),
           img: dataUrl,

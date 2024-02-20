@@ -43,18 +43,24 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import { useJobStore } from "../store/jobStore";
+import { onMounted, ref, watch } from "vue";
+import { useJobStoreIdb } from "../store/jobStoreIdb";
 import { computed } from "@vue/reactivity";
 
 export default {
   setup() {
-    const store = useJobStore();
-    const pastJobs = computed(() => store.jobs);
+    const store = useJobStoreIdb();
     const selectedRow = ref(null);
 
-    const onCapture = (job_info) => {
-      store.addJob(job_info);
+    const pastJobs = computed(() => store.jobs);
+
+    onMounted(async () => {
+      await store.getJobs();
+    });
+
+    const onCapture = async (job_info) => {
+      store.putJob(job_info);
+      await store.getJobs();
     };
 
     const setSelectedRow = (row) => {

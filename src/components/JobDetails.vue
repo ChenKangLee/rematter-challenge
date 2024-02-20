@@ -1,34 +1,30 @@
 <template>
   <div v-if="isSet">
     <div class="row q-col-gutter-lg justify-center">
-      <div class="col-10">
+      <div class="col-lg-8 col-md-10">
         <q-card class="my-card" flat bordered>
-          <q-item>
+          <q-card-section>
             <q-item-section>
               <div class="text-h6">Detection Job {{ toDisplay.id }}</div>
               <q-item-label caption>
                 Captured on x{{ toDisplay.date }}
               </q-item-label>
             </q-item-section>
-          </q-item>
-
+          </q-card-section>
           <q-separator />
-
-          <q-card-section>
-            <q-card-section class="justify-center">
+          <q-card-section class="justify-center">
+            <div class="q-pa-lg detail-image">
               <q-img
                 :src="toDisplay.img"
                 spinner-color="white"
                 :ratio="16 / 9"
                 class="rounded-borders"
               />
-            </q-card-section>
-
-            <q-separator />
-
-            <q-card-section class="col-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </q-card-section>
+            </div>
+          </q-card-section>
+          <q-separator />
+          <q-card-section class="col-4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </q-card-section>
         </q-card>
       </div>

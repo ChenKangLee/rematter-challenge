@@ -3,3 +3,8 @@
   height: 720;
   background: black;
 }
+
+.detail-image {
+  padding: 0.5em;
+  max-width: 1280px;
+}
