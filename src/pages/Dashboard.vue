@@ -26,7 +26,10 @@
             </div>
           </template>
           <template #after>
-            <JobDetails :selectedRow="selectedRow" />
+            <JobDetails
+              :selectedRow="selectedRow"
+              :processedImage="processedImage"
+            />
           </template>
         </q-splitter>
       </div>
@@ -46,11 +49,16 @@
 import { onMounted, ref, watch } from "vue";
 import { useJobStoreIdb } from "../store/jobStoreIdb";
 import { computed } from "@vue/reactivity";
+import useTesseract from "../composable/useTesseract.js";
+import useJimp from "../composable/useImageProcessing";
 
 export default {
   setup() {
     const store = useJobStoreIdb();
     const selectedRow = ref(null);
+    const { recognize } = useTesseract();
+    const { preprocessImage } = useJimp();
+    const processedImage = ref(null);
 
     const pastJobs = computed(() => store.jobs);
 
@@ -59,11 +67,23 @@ export default {
     });
 
     const onCapture = async (job_info) => {
+      /*try {
+        recognize(job_info.img).then((text) => {
+          console.log(text);
+        });
+      } catch (error) {
+        console.log(error);
+        return;
+      }*/
+
+      processedImage.value = await preprocessImage(job_info.img);
+
       store.putJob(job_info);
       await store.getJobs();
     };
 
-    const setSelectedRow = (row) => {
+    const setSelectedRow = async (row) => {
+      processedImage.value = await preprocessImage(row.img);
       selectedRow.value = row;
     };
 
@@ -74,6 +94,7 @@ export default {
       onCapture,
       setSelectedRow,
       selectedRow,
+      processedImage,
     };
   },
 };

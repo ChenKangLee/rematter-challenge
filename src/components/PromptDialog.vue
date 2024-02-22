@@ -43,7 +43,6 @@
 
 <script>
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import { createWorker, OEM } from "tesseract.js";
 
 export default {
   emits: ["onCapture"],
@@ -103,10 +102,11 @@ export default {
       clearInterval(frameTimer.value);
 
       // stop webcam
-      video.value.srcObject.getTracks().forEach((track) => track.stop());
+      if (video.value)
+        video.value.srcObject.getTracks().forEach((track) => track.stop());
     });
 
-    const onCapture = async () => {
+    const onCapture = () => {
       if (canvas.value) {
         const dataUrl = canvas.value.toDataURL("image/png");
         const dateNow = new Date();

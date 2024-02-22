@@ -24,6 +24,11 @@
           </q-card-section>
           <q-separator />
           <q-card-section class="col-4">
+            <q-img
+              :src="processedImage"
+              :ratio="16 / 9"
+              class="rounded-borders"
+            />
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </q-card-section>
         </q-card>
@@ -37,9 +42,9 @@ import { ref } from "@vue/reactivity";
 import { toRefs, watch } from "vue";
 
 export default {
-  props: ["selectedRow"],
+  props: ["selectedRow", "processedImage"],
   setup(props) {
-    const { selectedRow } = toRefs(props);
+    const { selectedRow, processedImage } = toRefs(props);
     const isSet = ref(false);
     const toDisplay = ref(null);
 

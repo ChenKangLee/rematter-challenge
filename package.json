@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.9",
+    "distance-transform": "^1.0.2",
+    "image-js": "^0.35.5",
+    "ndarray": "^1.0.19",
     "pinia": "^2.1.7",
     "quasar": "^2.14.4",
     "tesseract.js": "^5.0.4",
