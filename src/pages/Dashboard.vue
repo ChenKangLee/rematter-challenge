@@ -84,6 +84,9 @@ export default {
 
     const setSelectedRow = async (row) => {
       processedImage.value = await preprocessImage(row.img);
+      recognize(processedImage.value).then((text) => {
+        console.log(text);
+      });
       selectedRow.value = row;
     };
 
