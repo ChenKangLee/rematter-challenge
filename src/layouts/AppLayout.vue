@@ -11,15 +11,13 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-toolbar-title> ReMatter Fullstack SWE Challenge </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" bordered>
       <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+        <q-item-label header> Links </q-item-label>
 
         <DrawerLinks
           v-for="link in linksList"
@@ -46,10 +44,22 @@ import { ref } from "vue";
 
 const linksList = [
   {
-    title: "Docs",
-    caption: "quasar.dev",
-    icon: "school",
-    link: "https://quasar.dev",
+    title: "About Me",
+    caption: "Chen-Kang Lee's LinkedIn",
+    icon: "account_circle",
+    link: "https://www.linkedin.com/in/chen-kang-lee-64058a18b/",
+  },
+  {
+    title: "My Resume",
+    caption: "Google Drive",
+    icon: "description",
+    link: "https://www.linkedin.com/in/chen-kang-lee-64058a18b/",
+  },
+  {
+    title: "Github Repo",
+    caption: "ChenKangLee/rematter-challenge",
+    icon: "account_circle",
+    link: "https://www.linkedin.com/in/chen-kang-lee-64058a18b/",
   },
 ];
 

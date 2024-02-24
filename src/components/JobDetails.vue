@@ -7,7 +7,7 @@
             <q-item-section>
               <div class="text-h6">Detection Job {{ toDisplay.id }}</div>
               <q-item-label caption>
-                Captured on x{{ toDisplay.date }}
+                Captured on {{ toDisplay.date }}
               </q-item-label>
             </q-item-section>
           </q-card-section>
@@ -56,6 +56,7 @@ export default {
     return {
       isSet,
       toDisplay,
+      processedImage,
     };
   },
 };

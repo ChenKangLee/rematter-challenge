@@ -21,6 +21,12 @@
               ref="canvas"
               class="viewport fit rounded-borders"
             ></canvas>
+            <canvas
+              width="1124"
+              height="680"
+              ref="canvasHidden"
+              hidden
+            ></canvas>
           </div>
         </q-responsive>
       </div>
@@ -43,15 +49,20 @@
 
 <script>
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import cv from "@techstark/opencv-js";
+import useImgProcessing from "../composable/useImageProcessing";
 
 export default {
   emits: ["onCapture"],
   setup(props, { emit }) {
+    const { openCVProcessing } = useImgProcessing();
+
     const video = ref(null);
     const canvas = ref(null);
     const context = ref(false);
     const frameTimer = ref(null);
-    const worker = ref(null);
+    const canvasHidden = ref(null);
+
     const constraints = ref({
       audio: false,
       video: {
@@ -108,15 +119,31 @@ export default {
 
     const onCapture = () => {
       if (canvas.value) {
-        const dataUrl = canvas.value.toDataURL("image/png");
-        const dateNow = new Date();
-        const job_info = {
-          name: "Chen-Kang Lee",
-          date: dateNow.toLocaleString("en-US", { timeZoneName: "short" }),
-          img: dataUrl,
+        const imgOriUrl = canvas.value.toDataURL("image/png");
+        let mat = cv.matFromImageData(
+          // get image within the border box
+          context.value.getImageData(
+            0,
+            0,
+            canvas.value.width,
+            canvas.value.height,
+          ),
+        );
+
+        // here the image is in Mat format, we need to submit the processing job here
+        const resMat = openCVProcessing(mat);
+
+        // we needed to output to a hidden canvas on DOM just to get the base64 representation :((
+        cv.imshow(canvasHidden.value, resMat);
+        const imgProcessedUrl = canvasHidden.value.toDataURL("image/png");
+
+        const captureInfo = {
+          date: new Date().toLocaleString("en-US", { timeZoneName: "short" }),
+          imgOriginal: imgOriUrl,
+          imgProcessed: imgProcessedUrl,
         };
 
-        emit("onCapture", job_info);
+        emit("onCapture", captureInfo);
       }
     };
 
@@ -125,6 +152,7 @@ export default {
       onCapture,
       video,
       canvas,
+      canvasHidden,
     };
   },
 };

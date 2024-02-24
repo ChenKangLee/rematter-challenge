@@ -53,12 +53,12 @@ export default {
 
     return new Promise((resolve) => {
       let transaction = db.transaction(["jobs"], "readwrite");
-      transaction.oncomplete = (res) => {
-        resolve();
-      };
 
-      let store = transaction.objectStore("jobs");
-      store.put(job);
+      let putObjRequest = transaction.objectStore("jobs").put(job);
+      putObjRequest.onsuccess = () => {
+        const key = objectStoreTitleRequest.result;
+        resolve(key);
+      };
     });
   },
   async deleteJob(job) {

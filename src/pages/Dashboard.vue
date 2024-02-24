@@ -12,7 +12,7 @@
             <div class="row justify-end q-col-gutter-lg q-py-lg">
               <div class="col-12">
                 <q-btn
-                  label="Generate Data"
+                  label="Create Job"
                   icon="dataset"
                   color="primary"
                   @click="showPrompt = true"
@@ -50,14 +50,14 @@ import { onMounted, ref, watch } from "vue";
 import { useJobStoreIdb } from "../store/jobStoreIdb";
 import { computed } from "@vue/reactivity";
 import useTesseract from "../composable/useTesseract.js";
-import useJimp from "../composable/useImageProcessing";
+import useImgProcessing from "../composable/useImageProcessing";
 
 export default {
   setup() {
     const store = useJobStoreIdb();
     const selectedRow = ref(null);
     const { recognize } = useTesseract();
-    const { preprocessImage } = useJimp();
+    const { processText } = useImgProcessing();
     const processedImage = ref(null);
 
     const pastJobs = computed(() => store.jobs);
@@ -66,7 +66,7 @@ export default {
       await store.getJobs();
     });
 
-    const onCapture = async (job_info) => {
+    const onCapture = async (captureInfo) => {
       /*try {
         recognize(job_info.img).then((text) => {
           console.log(text);
@@ -75,18 +75,21 @@ export default {
         console.log(error);
         return;
       }*/
-
-      processedImage.value = await preprocessImage(job_info.img);
-
+      const toStore = {
+        ...captureInfo,
+        name: "...",
+      };
       store.putJob(job_info);
       await store.getJobs();
     };
 
     const setSelectedRow = async (row) => {
-      processedImage.value = await preprocessImage(row.img);
+      // processedImage.value = await preprocessImage(row.img);
+      processedImage.value = row.imgProcessed;
       recognize(processedImage.value).then((text) => {
         console.log(text);
       });
+
       selectedRow.value = row;
     };
 
