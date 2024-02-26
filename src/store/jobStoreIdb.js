@@ -5,7 +5,6 @@ import idb from "../api/indexDB";
 export const useJobStoreIdb = defineStore("jobs", {
   state: () => ({
     jobs: [],
-    autoIncrementKey: 1,
   }),
   actions: {
     async getJobs() {
@@ -15,13 +14,12 @@ export const useJobStoreIdb = defineStore("jobs", {
         this.jobs.push(job);
       });
     },
-    async createJob(job) {
+    async createJob(job, key) {
       const jobWithID = {
         ...job,
-        id: this.autoIncrementKey,
+        id: key,
       };
-      await idb.putJob(jobWithID, this.autoIncrementKey);
-      return this.autoIncrementKey++;
+      await idb.putJob(jobWithID, key);
     },
     async updateJob(job, key) {
       await idb.putJob(job, key);

@@ -49,12 +49,14 @@
 <script>
 import { onMounted, ref } from "vue";
 import { useJobStoreIdb } from "../store/jobStoreIdb";
+import { useKeyStore } from "../store/globalKeyStore";
 import { computed } from "@vue/reactivity";
 import useImgProcessing from "../composable/useImageProcessing";
 
 export default {
   setup() {
     const store = useJobStoreIdb();
+    const globalKeyStore = useKeyStore();
     const selectedRow = ref(null);
     const { extractText } = useImgProcessing();
 
@@ -72,15 +74,16 @@ export default {
         text: {},
         status: "processing",
       };
+
       // first call we dont supply the primary key and rely on auto increment return
-      const key = await store.createJob(toStore);
+      const key = globalKeyStore.key;
+      globalKeyStore.incrementKey();
+      await store.createJob(toStore, key);
       store.getJobs();
 
       // submit process job
       extractText(captureInfo.imgProcessed)
         .then((extractedText) => {
-          console.log(extractedText);
-
           const fn = extractedText.matchedFN || "---";
           const ln = extractedText.matchedLN || "---";
           const updatedInfo = {
