@@ -2,6 +2,10 @@
   <q-card class="q-pa-lg" flat bordered style="width: 800px; max-width: 80vw">
     <q-card-section>
       <div class="text-h6">Create a new capture</div>
+      <div class="text-caption text-italic">
+        Try to get the document to cover the whole viewport, under ample
+        lighting for best results
+      </div>
     </q-card-section>
     <q-card-section>
       <div class="row q-col-gutter">

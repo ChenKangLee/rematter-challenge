@@ -9,6 +9,10 @@
   max-width: 1280px;
 }
 
+.detail-error {
+  color: red;
+}
+
 .name-column {
   width: 100px;
 }

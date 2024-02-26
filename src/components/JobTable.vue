@@ -22,7 +22,11 @@
             </template>
             <template v-if="props.value === 'processing'">
               <q-badge color="amber-6" text-color="white" label="Processing">
-                <q-spinner color="bg-amber-6" class="q-px-xs" size="1.5em" />
+                <q-spinner-dots
+                  color="bg-amber-6"
+                  class="q-px-xs"
+                  size="1.3em"
+                />
               </q-badge>
             </template>
             <template v-if="props.value === 'error'">
@@ -40,7 +44,7 @@
         <q-td :props="props">
           <q-btn
             flat
-            color="red-8"
+            color="red"
             icon="highlight_off"
             @click.stop="rowDelete(props.row)"
           />

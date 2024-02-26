@@ -343,6 +343,7 @@ export default function useImgProcessing() {
     }
 
     const toReturn = {
+      matchedState,
       matchedDLN,
       matchedDOB,
       matchedEXP,

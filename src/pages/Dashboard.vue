@@ -92,6 +92,11 @@ export default {
           };
           store.updateJob(updatedInfo, key).then(() => {
             store.getJobs();
+
+            // manually update the detail page if it is selected
+            if (selectedRow && selectedRow.value.id == key) {
+              selectedRow.value = updatedInfo;
+            }
           });
         })
         .catch((error) => {
