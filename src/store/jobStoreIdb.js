@@ -5,17 +5,29 @@ import idb from "../api/indexDB";
 export const useJobStoreIdb = defineStore("jobs", {
   state: () => ({
     jobs: [],
+    autoIncrementKey: 1,
   }),
   actions: {
     async getJobs() {
-      this.jobs = [];
       let jobs = await idb.getJobs();
+      this.jobs = [];
       jobs.forEach((job) => {
         this.jobs.push(job);
       });
     },
-    async putJob(job) {
-      await idb.putJob(job);
+    async createJob(job) {
+      const jobWithID = {
+        ...job,
+        id: this.autoIncrementKey,
+      };
+      await idb.putJob(jobWithID, this.autoIncrementKey);
+      return this.autoIncrementKey++;
+    },
+    async updateJob(job, key) {
+      await idb.putJob(job, key);
+    },
+    async deleteJob(job) {
+      await idb.deleteJob(job.id);
     },
   },
 });

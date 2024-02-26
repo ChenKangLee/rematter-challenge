@@ -9,29 +9,55 @@
       flat
       bordered
       @row-click="rowClick"
+      :pagination="pagenation"
     >
       <template #top>
         <div class="text-subtitle1 text-weight-medium">Past Jobs</div>
+      </template>
+      <template #body-cell-status="props">
+        <q-td :props="props">
+          <div class="status-column">
+            <template v-if="props.value === 'done'">
+              <q-badge color="positive" text-color="white" label="Done" />
+            </template>
+            <template v-if="props.value === 'processing'">
+              <q-badge color="amber-6" text-color="white" label="Processing">
+                <q-spinner color="bg-amber-6" class="q-px-xs" size="1.5em" />
+              </q-badge>
+            </template>
+            <template v-if="props.value === 'error'">
+              <q-badge color="red" text-color="white" label="Error" />
+            </template>
+          </div>
+        </q-td>
+      </template>
+      <template #header-cell-name="props">
+        <q-th :props="props">
+          <div class="name-column">{{ props.col.label }}</div>
+        </q-th>
+      </template>
+      <template #body-cell-delete="props">
+        <q-td :props="props">
+          <q-btn
+            flat
+            color="red-8"
+            icon="highlight_off"
+            @click.stop="rowDelete(props.row)"
+          />
+        </q-td>
       </template>
     </q-table>
   </div>
 </template>
 
 <script>
-import { toRefs } from "vue";
+import { ref, toRefs } from "vue";
 
 export default {
   props: ["rows"],
-  emits: ["row-click"],
+  emits: ["row-click", "row-delete"],
   setup(props, { emit }) {
     const columns = [
-      {
-        name: "id",
-        label: "ID",
-        align: "left",
-        field: (row) => row.id,
-        sortable: false,
-      },
       {
         name: "name",
         label: "Name",
@@ -46,17 +72,36 @@ export default {
         align: "left",
         field: (row) => row.date,
       },
+      {
+        name: "status",
+        label: "Status",
+        sortable: true,
+        align: "left",
+        field: (row) => row.status,
+        classes: "ca-table",
+      },
+      { name: "delete", label: "", field: "", align: "center" },
     ];
     const { rows } = toRefs(props);
 
-    const rowClick = (evnt, row, idx) => {
+    const rowClick = (event, row, idx) => {
       emit("row-click", row);
+    };
+
+    const rowDelete = (row) => {
+      emit("row-delete", row);
     };
 
     return {
       columns,
       rows,
       rowClick,
+      rowDelete,
+      pagenation: {
+        sortBy: "date",
+        descending: true,
+        rowsPerPage: 10,
+      },
     };
   },
 };

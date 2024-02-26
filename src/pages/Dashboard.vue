@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="row q-col-gutter-lg">
       <div class="col-shrink">
-        <div class="text-h6">Title</div>
+        <div class="text-h6">Driver's Licence Text Extractor</div>
       </div>
     </div>
     <div class="row">
@@ -21,15 +21,16 @@
             </div>
             <div class="row justify-center q-pr-lg">
               <div class="col-12">
-                <JobTable :rows="pastJobs" @row-click="setSelectedRow" />
+                <JobTable
+                  :rows="pastJobs"
+                  @row-click="setSelectedRow"
+                  @row-delete="deleteRow"
+                />
               </div>
             </div>
           </template>
           <template #after>
-            <JobDetails
-              :selectedRow="selectedRow"
-              :processedImage="processedImage"
-            />
+            <JobDetails :selectedRow="selectedRow" />
           </template>
         </q-splitter>
       </div>
@@ -46,19 +47,16 @@
 </template>
 
 <script>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useJobStoreIdb } from "../store/jobStoreIdb";
 import { computed } from "@vue/reactivity";
-import useTesseract from "../composable/useTesseract.js";
 import useImgProcessing from "../composable/useImageProcessing";
 
 export default {
   setup() {
     const store = useJobStoreIdb();
     const selectedRow = ref(null);
-    const { recognize } = useTesseract();
-    const { processText } = useImgProcessing();
-    const processedImage = ref(null);
+    const { extractText } = useImgProcessing();
 
     const pastJobs = computed(() => store.jobs);
 
@@ -67,40 +65,72 @@ export default {
     });
 
     const onCapture = async (captureInfo) => {
-      /*try {
-        recognize(job_info.img).then((text) => {
-          console.log(text);
-        });
-      } catch (error) {
-        console.log(error);
-        return;
-      }*/
+      // first store a dummy place holder into the DB and remember the key
       const toStore = {
         ...captureInfo,
         name: "...",
+        text: {},
+        status: "processing",
       };
-      store.putJob(job_info);
-      await store.getJobs();
+      // first call we dont supply the primary key and rely on auto increment return
+      const key = await store.createJob(toStore);
+      store.getJobs();
+
+      // submit process job
+      extractText(captureInfo.imgProcessed)
+        .then((extractedText) => {
+          console.log(extractedText);
+
+          const fn = extractedText.matchedFN || "---";
+          const ln = extractedText.matchedLN || "---";
+          const updatedInfo = {
+            ...toStore,
+            id: key,
+            status: "done",
+            name: fn + " " + ln,
+            text: extractedText,
+          };
+          store.updateJob(updatedInfo, key).then(() => {
+            store.getJobs();
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          const updatedInfo = {
+            ...toStore,
+            id: key,
+            status: "error",
+            name: "...",
+            text: { error },
+          };
+          store.updateJob(updatedInfo, key).then(() => {
+            store.getJobs();
+          });
+        });
     };
 
     const setSelectedRow = async (row) => {
-      // processedImage.value = await preprocessImage(row.img);
-      processedImage.value = row.imgProcessed;
-      recognize(processedImage.value).then((text) => {
-        console.log(text);
-      });
-
       selectedRow.value = row;
+    };
+
+    const deleteRow = async (row) => {
+      // check if the deleted row is the one we are displaying
+      if (selectedRow.value && row.id === selectedRow.value.id) {
+        selectedRow.value = null;
+      }
+
+      await store.deleteJob(row);
+      await store.getJobs();
     };
 
     return {
       splitterModel: ref(45),
       showPrompt: ref(false),
       pastJobs,
+      selectedRow,
       onCapture,
       setSelectedRow,
-      selectedRow,
-      processedImage,
+      deleteRow,
     };
   },
 };

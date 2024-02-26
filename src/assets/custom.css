@@ -8,3 +8,11 @@
   padding: 0.5em;
   max-width: 1280px;
 }
+
+.name-column {
+  width: 100px;
+}
+
+.status-column {
+  width: 60px;
+}

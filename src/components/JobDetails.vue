@@ -15,7 +15,7 @@
           <q-card-section class="justify-center">
             <div class="q-pa-lg detail-image">
               <q-img
-                :src="toDisplay.img"
+                :src="toDisplay.imgOriginal"
                 spinner-color="white"
                 :ratio="16 / 9"
                 class="rounded-borders"
@@ -24,12 +24,7 @@
           </q-card-section>
           <q-separator />
           <q-card-section class="col-4">
-            <q-img
-              :src="processedImage"
-              :ratio="16 / 9"
-              class="rounded-borders"
-            />
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            {{ toDisplay.text }}
           </q-card-section>
         </q-card>
       </div>
@@ -48,9 +43,13 @@ export default {
     const isSet = ref(false);
     const toDisplay = ref(null);
 
-    watch(selectedRow, () => {
-      isSet.value = true;
-      toDisplay.value = selectedRow.value;
+    watch(selectedRow, (newVal, oldVal) => {
+      if (newVal) {
+        isSet.value = true;
+        toDisplay.value = selectedRow.value;
+      } else {
+        isSet.value = false;
+      }
     });
 
     return {

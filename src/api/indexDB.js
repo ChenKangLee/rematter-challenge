@@ -24,7 +24,9 @@ export default {
       request.onupgradeneeded = (e) => {
         console.log("[IDB]: onupgradeneeded");
         let db = e.target.result;
-        db.createObjectStore("jobs", { autoIncrement: true, keyPath: "id" });
+
+        // use out-of-line key
+        db.createObjectStore("jobs", { autoIncrement: false });
       };
     });
   },
@@ -48,20 +50,19 @@ export default {
       };
     });
   },
-  async putJob(job) {
+  async putJob(job, key) {
     let db = await this.getDB();
 
     return new Promise((resolve) => {
       let transaction = db.transaction(["jobs"], "readwrite");
 
-      let putObjRequest = transaction.objectStore("jobs").put(job);
+      let putObjRequest = transaction.objectStore("jobs").put(job, key);
       putObjRequest.onsuccess = () => {
-        const key = objectStoreTitleRequest.result;
-        resolve(key);
+        resolve();
       };
     });
   },
-  async deleteJob(job) {
+  async deleteJob(key) {
     let db = await this.getDB();
 
     return new Promise((resolve) => {
@@ -71,7 +72,9 @@ export default {
       };
 
       let store = trans.objectStore("jobs");
-      store.delete(job.id);
+      store.delete(key).onsuccess = () => {
+        resolve();
+      };
     });
   },
 };
