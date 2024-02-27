@@ -116,50 +116,14 @@ export default function useImgProcessing() {
     // convert to greyscale
     cv.cvtColor(mat, dst, cv.COLOR_BGR2GRAY);
 
+    // adjust contrast and brightness
     dst.convertTo(dst, -1, 1.35, 25);
 
+    // sharpen
     let sharpened = new cv.Mat();
     cv.GaussianBlur(dst, sharpened, new cv.Size(0, 0), 3);
     cv.addWeighted(dst, 1.5, sharpened, -0.5, 0, sharpened);
 
-    // historgram equalization
-    // cv.equalizeHist(dst, dst);
-
-    // apply otsu thesholding
-    // cv.threshold(dst, dst, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU);
-
-    /*
-    cv.adaptiveThreshold(
-      dst,
-      dst,
-      255,
-      cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-      cv.THRESH_BINARY_INV,
-      5,
-      4,
-    );
-
-    cv.distanceTransform(dst, dst, cv.DIST_L1, 3);
-    cv.normalize(dst, dst, 0, 255, cv.NORM_MINMAX);
-    dst.convertTo(dst, cv.CV_8U);
-
-    // apply otsu thesholding
-    cv.threshold(dst, dst, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU);
-
-    const kernel_open = cv.getStructuringElement(
-      cv.MORPH_ELLIPSE,
-      new cv.Size(2, 3),
-    );
-    cv.morphologyEx(dst, dst, cv.MORPH_OPEN, kernel_open);
-
-    const kernel_close = cv.getStructuringElement(
-      cv.MORPH_RECT,
-      new cv.Size(3, 3),
-    );
-    cv.morphologyEx(dst, dst, cv.MORPH_CLOSE, kernel_close);
-
-    cv.bitwise_not(dst, dst);
-  */
     return sharpened;
   };
 
@@ -179,6 +143,7 @@ export default function useImgProcessing() {
     });
   };
 
+  /* Extracted Text Post Processing */
   const _fuzzyMatchFields = (recognitionRes) => {
     const {
       data: { lines, words },
@@ -199,7 +164,7 @@ export default function useImgProcessing() {
           .replace(/[ÌÍÎÏìíîïΙІіЇї]/gi, "I")
           .replace(/[ĴĵЈј]/gi, "J")
           .replace(/[ĶķΚКк]/gi, "K")
-          .replace(/[ĹĺĻļĽľĿŀŁłΛЛл]/gi, "L")
+          .replace(/[ĹĺĻļĽľĿŀŁłΛЛл|]/gi, "L")
           .replace(/[ΜМм]/gi, "M")
           .replace(/[ÑñŃńŅņŇňΝНн]/gi, "N")
           .replace(/[ÒÓÔÕÖØòóôõöøΟОоΩω]/gi, "O")
@@ -227,11 +192,6 @@ export default function useImgProcessing() {
       if (result.length > 0) {
         matchedState = state;
       }
-    }
-    if (!matchedState) {
-      throw new Error(
-        "No state found in the document, maybe re-take a picture?",
-      );
     }
 
     // Now knowing which state the license is from, we can parse DL accordingly from the `words`
@@ -269,13 +229,12 @@ export default function useImgProcessing() {
     });
 
     let matchedDLN = null;
-    for (let w of wordsProcessed) {
-      const matches = w.match(licenseRule[matchedState]);
-      if (matches) matchedDLN = matches[0];
+    if (matchedState) {
+      for (let w of wordsProcessed) {
+        const matches = w.match(licenseRule[matchedState]);
+        if (matches) matchedDLN = matches[0];
+      }
     }
-    //if (matchedDLN === "") {
-    //  throw new Error("No DLN found in the document, maybe re-take a picture?");
-    // }
 
     // DOB
     let matchedDOB = null;

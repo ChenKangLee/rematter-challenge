@@ -55,8 +55,8 @@ import useImgProcessing from "../composable/useImageProcessing";
 
 export default {
   setup() {
-    const store = useJobStoreIdb();
-    const globalKeyStore = useKeyStore();
+    const store = useJobStoreIdb(); // Pinia Store for jobTable
+    const globalKeyStore = useKeyStore(); // Pinia Store for persistant globalKey
     const selectedRow = ref(null);
     const { extractText } = useImgProcessing();
 
@@ -75,7 +75,6 @@ export default {
         status: "processing",
       };
 
-      // first call we dont supply the primary key and rely on auto increment return
       const key = globalKeyStore.key;
       globalKeyStore.incrementKey();
       await store.createJob(toStore, key);

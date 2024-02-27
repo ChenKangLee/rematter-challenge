@@ -50,16 +50,10 @@ const linksList = [
     link: "https://www.linkedin.com/in/chen-kang-lee-64058a18b/",
   },
   {
-    title: "My Resume",
-    caption: "Google Drive",
-    icon: "description",
-    link: "https://www.linkedin.com/in/chen-kang-lee-64058a18b/",
-  },
-  {
     title: "Github Repo",
     caption: "ChenKangLee/rematter-challenge",
-    icon: "account_circle",
-    link: "https://www.linkedin.com/in/chen-kang-lee-64058a18b/",
+    icon: "ramp_left",
+    link: "https://github.com/ChenKangLee/rematter-challenge",
   },
 ];
 
