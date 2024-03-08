@@ -11,10 +11,24 @@
   </q-item>
 </template>
 
-<script>
-export default {
-  props: ['title', 'caption', 'link', 'icon'],
-  setup() { }
-}
-</script>
+<script lang="ts">
+import { defineComponent } from "vue";
 
+export default defineComponent({
+  props: {
+    title: {
+      type: String,
+    },
+    caption: {
+      type: String,
+    },
+    link: {
+      type: String,
+    },
+    icon: {
+      type: String,
+    },
+  },
+  setup() {},
+});
+</script>

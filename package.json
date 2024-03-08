@@ -11,10 +11,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.9",
     "@techstark/opencv-js": "^4.9.0-release.2",
-    "distance-transform": "^1.0.2",
     "fuse.js": "^7.0.0",
-    "image-js": "^0.35.5",
-    "ndarray": "^1.0.19",
     "pinia": "^2.1.7",
     "quasar": "^2.14.4",
     "tesseract.js": "^5.0.4",

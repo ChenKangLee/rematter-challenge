@@ -51,21 +51,22 @@
   </q-card>
 </template>
 
-<script>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import cv from "@techstark/opencv-js";
+<script lang="ts">
+import { ref, onMounted, onBeforeUnmount, defineComponent } from "vue";
+import * as cv from "@techstark/opencv-js";
 import useImgProcessing from "../composable/useImageProcessing";
+import { CapturedInfo } from "../types";
 
-export default {
+export default defineComponent({
   emits: ["onCapture"],
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     const { openCVProcessing } = useImgProcessing();
 
-    const video = ref(null);
-    const canvas = ref(null);
-    const context = ref(false);
-    const frameTimer = ref(null);
-    const canvasHidden = ref(null);
+    const video = ref<HTMLVideoElement>();
+    const canvas = ref<HTMLCanvasElement>();
+    const context = ref<CanvasRenderingContext2D | null>();
+    const frameTimer = ref<number>();
+    const canvasHidden = ref<HTMLCanvasElement>();
 
     const constraints = ref({
       audio: false,
@@ -75,19 +76,21 @@ export default {
       },
     });
 
-    navigator.getUserMedia =
-      navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia;
+    let nav = <any>navigator;
+
+    nav.getUserMedia =
+      nav.getUserMedia ||
+      nav.webkitGetUserMedia ||
+      nav.mozGetUserMedia ||
+      nav.msGetUserMedia;
 
     const drawFrame = () => {
-      context.value.drawImage(
-        video.value,
+      context.value!.drawImage(
+        video.value!,
         0,
         0,
-        canvas.value.width,
-        canvas.value.height,
+        canvas.value!.width,
+        canvas.value!.height,
       );
     };
 
@@ -95,18 +98,18 @@ export default {
       if (video.value && canvas.value) {
         context.value = canvas.value.getContext("2d");
 
-        await navigator.mediaDevices
+        await nav.mediaDevices
           .getUserMedia(constraints.value)
-          .then((stream) => {
-            video.value.srcObject = stream;
-            video.value.play();
+          .then((stream: MediaStream) => {
+            video.value!.srcObject = stream;
+            video.value!.play();
 
             // register drawFrame to run periodically
             frameTimer.value = window.setInterval(() => {
               drawFrame();
             }, 1000 / 30);
           })
-          .catch((e) => {
+          .catch((e: DOMException) => {
             console.error(e);
           });
       }
@@ -118,7 +121,9 @@ export default {
 
       // stop webcam
       if (video.value)
-        video.value.srcObject.getTracks().forEach((track) => track.stop());
+        (<MediaStream>video.value.srcObject!)
+          .getTracks()
+          .forEach((track) => track.stop());
     });
 
     const onCapture = () => {
@@ -126,7 +131,7 @@ export default {
         const imgOriUrl = canvas.value.toDataURL("image/png");
         let mat = cv.matFromImageData(
           // get image within the border box
-          context.value.getImageData(
+          context.value!.getImageData(
             0,
             0,
             canvas.value.width,
@@ -138,10 +143,12 @@ export default {
         const resMat = openCVProcessing(mat);
 
         // we needed to output to a hidden canvas on DOM just to get the base64 representation :((
-        cv.imshow(canvasHidden.value, resMat);
-        const imgProcessedUrl = canvasHidden.value.toDataURL("image/png");
+        cv.imshow(canvasHidden.value!, resMat);
 
-        const captureInfo = {
+        const imgProcessedUrl: string =
+          canvasHidden.value!.toDataURL("image/png");
+
+        const captureInfo: CapturedInfo = {
           date: new Date().toLocaleString("en-US", { timeZoneName: "short" }),
           imgOriginal: imgOriUrl,
           imgProcessed: imgProcessedUrl,
@@ -159,5 +166,5 @@ export default {
       canvasHidden,
     };
   },
-};
+});
 </script>

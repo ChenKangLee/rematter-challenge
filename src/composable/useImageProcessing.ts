@@ -1,6 +1,9 @@
-import { createWorker } from "tesseract.js";
-import cv from "@techstark/opencv-js";
+import Tesseract, { createWorker } from "tesseract.js";
+import cv, { Mat } from "@techstark/opencv-js";
 import Fuse from "fuse.js";
+import { ExtractedText } from "../types";
+
+type Dictionary = { [index: string]: RegExp };
 
 export default function useImgProcessing() {
   const states = [
@@ -56,7 +59,7 @@ export default function useImgProcessing() {
     "Wyoming",
   ];
 
-  const licenseRule = {
+  const licenseRule: Dictionary = {
     Alabama: /[0-9]{7,8}/g,
     Alaska: /[0-9]{7}/g,
     Arizona: /(?:[A-Z]{1}[0-9]{8}|[0-9]{9})/g,
@@ -110,7 +113,7 @@ export default function useImgProcessing() {
   };
 
   /* preprocessImage using OpenCV */
-  const openCVProcessing = (mat) => {
+  const openCVProcessing = (mat: Mat): Mat => {
     let dst = new cv.Mat();
 
     // convert to greyscale
@@ -127,24 +130,22 @@ export default function useImgProcessing() {
     return sharpened;
   };
 
-  const extractText = async (imageUrl) => {
+  const extractText = async (imageUrl: string) => {
     const worker = await createWorker("eng");
 
-    return new Promise((resolve, reject) => {
+    return new Promise<ExtractedText>((resolve, reject) => {
       worker.recognize(imageUrl).then((res) => {
-        let matchedVal = {};
         try {
-          matchedVal = _fuzzyMatchFields(res);
+          resolve(_fuzzyMatchFields(res));
         } catch (error) {
           reject(error);
         }
-        resolve(matchedVal);
       });
     });
   };
 
   /* Extracted Text Post Processing */
-  const _fuzzyMatchFields = (recognitionRes) => {
+  const _fuzzyMatchFields = (recognitionRes: Tesseract.RecognizeResult) => {
     const {
       data: { lines, words },
     } = recognitionRes;
@@ -301,7 +302,7 @@ export default function useImgProcessing() {
       }
     }
 
-    const toReturn = {
+    const toReturn: ExtractedText = {
       matchedState,
       matchedDLN,
       matchedDOB,

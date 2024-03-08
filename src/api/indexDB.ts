@@ -1,10 +1,12 @@
+import { Job } from "../types";
+
 const DB_NAME = "rematter_db";
 const DB_VERSION = 1;
-let DB;
+let DB: IDBDatabase;
 
 export default {
   async getDB() {
-    return new Promise((resolve, reject) => {
+    return new Promise<IDBDatabase>((resolve, reject) => {
       if (DB) {
         return resolve(DB);
       }
@@ -17,13 +19,13 @@ export default {
       };
 
       request.onsuccess = (e) => {
-        DB = e.target.result;
+        DB = (<IDBRequest>e.target)!.result;
         resolve(DB);
       };
 
-      request.onupgradeneeded = (e) => {
+      request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
         console.log("[IDB]: onupgradeneeded");
-        let db = e.target.result;
+        let db = (<IDBRequest>e.target)!.result;
 
         // use out-of-line key
         db.createObjectStore("jobs", { autoIncrement: false });
@@ -33,8 +35,8 @@ export default {
   async getJobs() {
     let db = await this.getDB();
 
-    return new Promise((resolve) => {
-      let jobs = [];
+    return new Promise<Array<Job>>((resolve) => {
+      let jobs: Array<Job> = [];
       let transaction = db.transaction(["jobs"], "readonly");
       transaction.oncomplete = () => {
         resolve(jobs);
@@ -42,7 +44,7 @@ export default {
 
       let store = transaction.objectStore("jobs");
       store.openCursor().onsuccess = (e) => {
-        let cursor = e.target.result;
+        let cursor = (<IDBRequest>e.target)!.result;
         if (cursor) {
           jobs.push(cursor.value);
           cursor.continue();
@@ -50,10 +52,10 @@ export default {
       };
     });
   },
-  async putJob(job, key) {
+  async putJob(job: Job, key: number) {
     let db = await this.getDB();
 
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       let transaction = db.transaction(["jobs"], "readwrite");
 
       let putObjRequest = transaction.objectStore("jobs").put(job, key);
@@ -62,17 +64,17 @@ export default {
       };
     });
   },
-  async deleteJob(key) {
+  async deleteJob(key: number | null) {
     let db = await this.getDB();
 
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       let trans = db.transaction(["jobs"], "readwrite");
       trans.oncomplete = () => {
         resolve();
       };
 
       let store = trans.objectStore("jobs");
-      store.delete(key).onsuccess = () => {
+      store.delete(key!).onsuccess = () => {
         resolve();
       };
     });

@@ -54,11 +54,16 @@
   </div>
 </template>
 
-<script>
-import { ref, toRefs } from "vue";
+<script lang="ts">
+import { toRefs, defineComponent, PropType } from "vue";
+import { Job } from "../types";
 
-export default {
-  props: ["rows"],
+export default defineComponent({
+  props: {
+    rows: {
+      type: Object as PropType<Array<Job>>,
+    },
+  },
   emits: ["row-click", "row-delete"],
   setup(props, { emit }) {
     const columns = [
@@ -66,7 +71,7 @@ export default {
         name: "name",
         label: "Name",
         align: "left",
-        field: (row) => row.name,
+        field: (row: Job) => row.name,
         sortable: false,
       },
       {
@@ -74,25 +79,25 @@ export default {
         label: "Date Created",
         sortable: true,
         align: "left",
-        field: (row) => row.date,
+        field: (row: Job) => row.date,
       },
       {
         name: "status",
         label: "Status",
         sortable: true,
         align: "left",
-        field: (row) => row.status,
+        field: (row: Job) => row.status,
         classes: "ca-table",
       },
       { name: "delete", label: "", field: "", align: "center" },
     ];
     const { rows } = toRefs(props);
 
-    const rowClick = (event, row, idx) => {
+    const rowClick = (_event: Event, row: Job, _idx: number) => {
       emit("row-click", row);
     };
 
-    const rowDelete = (row) => {
+    const rowDelete = (row: Job) => {
       emit("row-delete", row);
     };
 
@@ -108,5 +113,5 @@ export default {
       },
     };
   },
-};
+});
 </script>

@@ -11,7 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> ReMatter Fullstack SWE Challenge </q-toolbar-title>
+        <!--<q-toolbar-title> ReMatter Fullstack SWE Challenge </q-toolbar-title>-->
       </q-toolbar>
     </q-header>
 
@@ -39,8 +39,8 @@
     </q-page-container>
   </q-layout>
 </template>
-<script>
-import { ref } from "vue";
+<script lang="ts">
+import { ref, defineComponent } from "vue";
 
 const linksList = [
   {
@@ -57,7 +57,7 @@ const linksList = [
   },
 ];
 
-export default {
+export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false);
     const toggleLeftDrawer = () => {
@@ -69,5 +69,5 @@ export default {
       toggleLeftDrawer,
     };
   },
-};
+});
 </script>

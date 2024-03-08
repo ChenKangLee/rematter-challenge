@@ -11,7 +11,7 @@ const getDefaultState = () => ({
 export const useKeyStore = defineStore("key", {
   state: () => ({
     store: localStorage.getItem(STORE_NAME)
-      ? JSON.parse(localStorage.getItem(STORE_NAME))
+      ? JSON.parse(localStorage.getItem(STORE_NAME)!)
       : getDefaultState(),
   }),
   getters: {

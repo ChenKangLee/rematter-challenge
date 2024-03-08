@@ -46,18 +46,19 @@
   </q-dialog>
 </template>
 
-<script>
-import { onMounted, ref } from "vue";
+<script lang="ts">
+import { onMounted, ref, defineComponent } from "vue";
 import { useJobStoreIdb } from "../store/jobStoreIdb";
 import { useKeyStore } from "../store/globalKeyStore";
 import { computed } from "@vue/reactivity";
 import useImgProcessing from "../composable/useImageProcessing";
+import { CapturedInfo, Job, ExtractedText } from "../types";
 
-export default {
+export default defineComponent({
   setup() {
     const store = useJobStoreIdb(); // Pinia Store for jobTable
     const globalKeyStore = useKeyStore(); // Pinia Store for persistant globalKey
-    const selectedRow = ref(null);
+    const selectedRow = ref<Job>();
     const { extractText } = useImgProcessing();
 
     const pastJobs = computed(() => store.jobs);
@@ -66,13 +67,14 @@ export default {
       await store.getJobs();
     });
 
-    const onCapture = async (captureInfo) => {
+    const onCapture = async (captureInfo: CapturedInfo) => {
       // first store a dummy place holder into the DB and remember the key
-      const toStore = {
+      const toStore: Job = {
         ...captureInfo,
         name: "...",
-        text: {},
+        text: <ExtractedText>{},
         status: "processing",
+        id: null,
       };
 
       const key = globalKeyStore.key;
@@ -96,14 +98,14 @@ export default {
             store.getJobs();
 
             // manually update the detail page if it is selected
-            if (selectedRow && selectedRow.value.id == key) {
+            if (selectedRow && selectedRow.value!.id == key) {
               selectedRow.value = updatedInfo;
             }
           });
         })
-        .catch((error) => {
+        .catch((error: string) => {
           console.error(error);
-          const updatedInfo = {
+          const updatedInfo: Job = {
             ...toStore,
             id: key,
             status: "error",
@@ -116,14 +118,14 @@ export default {
         });
     };
 
-    const setSelectedRow = async (row) => {
+    const setSelectedRow = async (row: Job) => {
       selectedRow.value = row;
     };
 
-    const deleteRow = async (row) => {
+    const deleteRow = async (row: Job) => {
       // check if the deleted row is the one we are displaying
       if (selectedRow.value && row.id === selectedRow.value.id) {
-        selectedRow.value = null;
+        selectedRow.value = <Job>{};
       }
 
       await store.deleteJob(row);
@@ -140,5 +142,5 @@ export default {
       deleteRow,
     };
   },
-};
+});
 </script>
