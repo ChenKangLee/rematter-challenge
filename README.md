@@ -1,6 +1,6 @@
-# Rematter SWE Challenge
+# Driver's License Field Extractor
 
-This is a driver's license text extraction web app for the Rematter SWE interview process.
+This is a driver's license text extraction web app implemented in Vue.js + Typescript.
 
 ## 1. Archtitecture Overview
 
